@@ -484,17 +484,22 @@ check_systemd_api()
                 KUBELET_CLIENT_CERTIFICATE=$(systemctl cat kube-apiserver.service | grep "\--kubelet-client-certificate" | awk '{print $1}' | cut -d "=" -f2)
                 KUBELET_CLIENT_KEY=$(systemctl cat kube-apiserver.service | grep "\--kubelet-client-key" | awk '{print $1}' | cut -d "=" -f2)
                 SERVICE_ACCOUNT_KEY_FILE=$(systemctl cat kube-apiserver.service | grep "\--service-account-key-file" | awk '{print $1}' | cut -d "=" -f2)
+                SERVICE_ACCOUNT_SIGNING_KEY_FILE=$(systemctl cat kube-apiserver.service | grep "\--service-account-signing-key-file" | awk '{print $1}' | cut -d "=" -f2)
+                SERVICE_ACCOUNT_ISSUER=$(systemctl cat kube-apiserver.service | grep "\--service-account-issuer" | awk '{print $1}' | cut -d "=" -f2)
                 TLS_CERT_FILE=$(systemctl cat kube-apiserver.service | grep "\--tls-cert-file" | awk '{print $1}' | cut -d "=" -f2)
                 TLS_PRIVATE_KEY_FILE=$(systemctl cat kube-apiserver.service | grep "\--tls-private-key-file" | awk '{print $1}' | cut -d "=" -f2)
+                
 
                 CACERT=/var/lib/kubernetes/ca.crt
                 APICERT=/var/lib/kubernetes/kube-apiserver.crt
                 APIKEY=/var/lib/kubernetes/kube-apiserver.key
                 SACERT=/var/lib/kubernetes/service-account.crt
+                SAKEY=/var/lib/kubernetes/service-account.key
                 if [ $ADVERTISE_ADDRESS == $INTERNAL_IP ] && [ $CLIENT_CA_FILE == $CACERT ] && [ $ETCD_CA_FILE == $CACERT ] && \
                    [ $ETCD_CERT_FILE == "/var/lib/kubernetes/etcd-server.crt" ] && [ $ETCD_KEY_FILE == "/var/lib/kubernetes/etcd-server.key" ] && \
                    [ $KUBELET_CERTIFICATE_AUTHORITY == $CACERT ] && [ $KUBELET_CLIENT_CERTIFICATE == $APICERT ] && [ $KUBELET_CLIENT_KEY == $APIKEY ] && \
-                   [ $SERVICE_ACCOUNT_KEY_FILE == $SACERT ] && [ $TLS_CERT_FILE == $APICERT ] && [ $TLS_PRIVATE_KEY_FILE == $APIKEY ]
+                   [ $SERVICE_ACCOUNT_KEY_FILE == $SAKEY ] && [ $TLS_CERT_FILE == $APICERT ] && [ $TLS_PRIVATE_KEY_FILE == $APIKEY ]  && \
+                   [ $SERVICE_ACCOUNT_SIGNING_KEY_FILE == $SAKEY ] && [ $SERVICE_ACCOUNT_ISSUER == 'service-accounts' ]
                     then
                         printf "${SUCCESS}kube-apiserver advertise-address/ client-ca-file/ etcd-cafile/ etcd-certfile/ etcd-keyfile/ kubelet-certificate-authority/ kubelet-client-certificate/ kubelet-client-key/ service-account-key-file/ tls-cert-file/ tls-private-key-file are correct\n"
                     else
